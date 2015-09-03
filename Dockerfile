@@ -1,10 +1,3 @@
-# 1. exec 'docker build -t image_name ./' to make docker image
-# 2. exec 'docker run --name container_name -i -t -d image_name'
-# 3. exec 'docker exec -it container_name bash' to enter the container
-# 4. edit /home/hubot/myslackbot/bin/run_hubot.sh to set environment variables(eg: TOKEN)
-# 5. exec 'service supervisord on'
-# (6. if you wanna add other hubot scripts, 'npm install <scripts> --save' and edit external-scripts.json)
-
 FROM centos:centos6
 RUN sed -i 's/mirrorlist=http/#mirrorlist=http/g'                                    /etc/yum.repos.d/CentOS-Base.repo
 RUN sed -i 's!#baseurl=http://mirror.centos.org!baseurl=http://ftp.riken.jp/Linux!g' /etc/yum.repos.d/CentOS-Base.repo
@@ -27,16 +20,18 @@ RUN rpm -ivh epel-release-6-8.noarch.rpm
 RUN rm -f epel-release-6-8.noarch.rpm
 RUN yum -y install supervisor --enablerepo=epel
 RUN chkconfig supervisord on
-RUN mkdir /var/log/supervisord/hubot-slack
-ADD src/supervisord.conf /etc
+RUN mkdir /var/log/supervisor/hubot-slack
+ADD ./src/supervisord.conf /etc/
 
 USER hubot
 RUN mkdir /home/hubot/myslackbot
 WORKDIR /home/hubot/myslackbot
 
 RUN curl -k -L git.io/nodebrew | perl - setup
+ENV PATH /home/hubot/.nodebrew/current/bin:$PATH
 RUN nodebrew install v0.10.35
 RUN nodebrew use 0.10.35
+ENV PATH /home/hubot/myslackbot/node_modules/.bin:$PATH
 
 RUN npm install  generator-hubot
 RUN npm install  yo
@@ -46,11 +41,7 @@ RUN npm install  hubot-slack
 
 RUN yes | yo hubot --defaults
 
-ADD src/run_hubot.sh ./bin
-RUN chmod +x ./bin/run_hubot.sh
+ADD ./src/run_hubot.sh ./bin/
+RUN sudo chmod +x ./bin/run_hubot.sh
 
 RUN sed -i "s/npm install/#npm install/g" ./bin/hubot
-RUN mkdir log
-
-#ENV HUBOT_SLACK_TOKEN 12345
-#RUN hubot -a slack
