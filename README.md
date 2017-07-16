@@ -1,18 +1,25 @@
-# How to use
+# hubot-slack-template
 
-1. exec 'docker build -t image_name ./' to make docker image
-2. exec 'docker run --name container_name -i -t -d image_name'
-3. exec 'docker exec -it container_name bash' to enter the container
-4. edit /home/hubot/myslackbot/bin/run_hubot.sh to set environment variables(eg: TOKEN)
-5. exec 'service supervisord on'
-6. if you wanna add other hubot scripts, exec 'npm install <scripts> --save' and edit external-scripts.json)
+Dockerfile for hubot with slack.
 
-# Log file
+# Plugins
 
-## /etc/supervisord.conf
+* hubot-help
+* hubot-google-translate
+* hubot-google-images
+* hubot-pugme
+* hubot-maps
+* hubot-youtube
+* hubot-docomo-dialog
+
+# Usage
 
 ```
-logfile=/var/log/supervisor/hubot-slack/default.log
-stdout_logfile=/var/log/supervisor/hubot-slack/stdout.log
-stderr_logfile=/var/log/supervisor/hubot-slack/stderr.log
+$ docker build https://github.com/nemupm/hubot-slack-template.git#master --tag hubot-image
+$ docker run --rm \
+    -e HUBOT_SLACK_TOKEN=XXXXXXXXXX \
+    -e DOCOMO_API_KEY=XXXXXXXXXX \
+    -e CHARACTER_TYPE=20 \
+    hubot-image
 ```
+
